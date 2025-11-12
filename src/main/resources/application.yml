@@ -1,0 +1,106 @@
+# ============================================================
+# API Gateway - Production Configuration
+# ============================================================
+
+# Server Configuration
+server:
+  port: 8080
+
+# Application Config
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: prod
+
+  # Gateway Configuration
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # Auth Service
+        - id: auth-service
+          uri: lb://${AUTH_SERVICE_NAME:auth-service}
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<segment>.*), /api/auth/${segment}
+            - AddRequestHeader=X-Gateway-Source, api-gateway
+
+        # User Service
+        - id: user-service
+          uri: lb://${USER_SERVICE_NAME:user-service}
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /api/users/${segment}
+            - AddRequestHeader=X-Gateway-Source, api-gateway
+
+      # Global CORS for production
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins:
+              - "${FRONTEND_URL:https://intranet.proscience.com}"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowed-headers:
+              - Authorization
+              - Content-Type
+            allow-credentials: true
+            max-age: 3600
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      default-zone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+    instance-id: ${spring.application.name}:${server.port}
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, gateway, routes
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
+
+# OpenAPI aggregated docs
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /auth-service/api-docs
+      - name: User Service
+        url: /user-service/api-docs
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Logging Production
+logging:
+  level:
+    org.springframework.cloud.gateway: WARN
+    root: WARN
+
+# JWT Key from environment
+security:
+  jwt:
+    key:
+      private: ${JWT_PRIVATE_KEY}
