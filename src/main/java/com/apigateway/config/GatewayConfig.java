@@ -31,7 +31,6 @@ public class GatewayConfig {
                         .method(HttpMethod.GET)
                         .uri("lb://auth-service"))
 
-                // Swagger/OpenAPI routes
                 .route("auth-swagger-docs", r -> r
                         .path("/auth-service/api-docs")
                         .uri("lb://auth-service/api-docs"))
