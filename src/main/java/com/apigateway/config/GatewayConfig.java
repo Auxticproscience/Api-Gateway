@@ -1,4 +1,4 @@
-package com.apigateway.config;
+/* package com.apigateway.config;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -45,3 +45,5 @@ public class GatewayConfig {
                 .build();
     }
 }
+
+*/
