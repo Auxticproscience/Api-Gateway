@@ -39,6 +39,10 @@ public class GatewayConfig {
                 .route("auth-swagger-ui", r -> r
                         .path("/auth-service/swagger-ui/**")
                         .uri("lb://auth-service"))
+
+                .route("user-service", r -> r
+                        .path("/api/users/**")
+                        .uri("lb://user-service"))
                 .build();
     }
 }
