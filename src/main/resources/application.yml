@@ -1,5 +1,5 @@
 # ============================================================
-# API Gateway - Production Configuration
+# API Gateway - Production Configuration (FIXED)
 # ============================================================
 
 # Server Configuration
@@ -21,6 +21,7 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+      # ✅ CORS Configuration - SIMPLIFICADA Y CORRECTA
       globalcors:
         add-to-simple-url-handler-mapping: true
         corsConfigurations:
@@ -28,16 +29,25 @@ spring:
             allowedOrigins:
               - "https://intranet-frontend-seven.vercel.app"
               - "http://localhost:4200"
-            allowedMethods: "*"
-            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - Authorization
+              - Content-Type
             allowCredentials: true
             maxAge: 3600
 
-      # Global filters
+      # ✅ ELIMINAR HEADERS CONFLICTIVOS
+      # Solo mantener DedupeResponseHeader para evitar duplicados
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-        - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-pf49.vercel.app
-        - AddResponseHeader=Access-Control-Allow-Credentials, true
 
       routes:
         # Auth Service Routes
@@ -94,7 +104,8 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.web: DEBUG
+    org.springframework.web.cors: DEBUG
+    org.springframework.http.server.reactive: DEBUG
     reactor.netty: INFO
     root: INFO
 
