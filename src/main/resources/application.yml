@@ -26,7 +26,7 @@ spring:
         corsConfigurations:
           '[/**]':
             allowedOrigins:
-              - "https://intranet-frontend-pf49.vercel.app"
+              - "https://intranet-frontend-seven.vercel.app"
               - "http://localhost:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
