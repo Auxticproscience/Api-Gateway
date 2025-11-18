@@ -21,6 +21,18 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://intranet-frontend-pf49.vercel.app"
+              - "http://localhost:4200"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
       # Global filters
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
@@ -52,17 +64,6 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
-
-      # Global CORS
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins:
-              - "https://intranet-frontend-pf49.vercel.app"
-              - "http://localhost:4200"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
 
 # Eureka Client Configuration
 eureka:
