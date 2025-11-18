@@ -21,10 +21,11 @@ spring:
           enabled: true
           lower-case-service-id: true
 
-          # Global filters
-          default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-            - PreserveHostHeader
+      # Global filters
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+        - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-pf49.vercel.app
+        - AddResponseHeader=Access-Control-Allow-Credentials, true
 
       routes:
         # Auth Service Routes
@@ -62,12 +63,6 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
-
-        default-filters:
-          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-          - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-pf49.vercel.app
-          - AddResponseHeader=Access-Control-Allow-Credentials, true
-
 
 # Eureka Client Configuration
 eureka:
