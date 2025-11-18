@@ -1,5 +1,5 @@
 # ============================================================
-# API Gateway - Production Configuration (FIXED)
+# API Gateway - Production Configuration
 # ============================================================
 
 # Server Configuration
@@ -21,35 +21,16 @@ spring:
           enabled: true
           lower-case-service-id: true
 
-      # ✅ CORS Configuration - SIMPLIFICADA Y CORRECTA
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins:
-              - "https://intranet-frontend-seven.vercel.app"
-              - "http://localhost:4200"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-              - PATCH
-            allowedHeaders:
-              - "*"
-            exposedHeaders:
-              - Authorization
-              - Content-Type
-            allowCredentials: true
-            maxAge: 3600
-
-      # ✅ ELIMINAR HEADERS CONFLICTIVOS
-      # Solo mantener DedupeResponseHeader para evitar duplicados
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-
       routes:
+        # Gateway Health
+        - id: gateway-simple-health
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/health
+            - Method=GET
+          filters:
+            - RewritePath=/api/health, /actuator/health
+
         # Auth Service Routes
         - id: auth-login
           uri: lb://auth-service
@@ -82,11 +63,14 @@ eureka:
       defaultZone: ${EUREKA_SERVER_URL}
     fetch-registry: true
     register-with-eureka: true
+    registry-fetch-interval-seconds: 5
   instance:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
     instance-id: ${spring.application.name}:${server.port}
+    health-check-url-path: /actuator/health
+    status-page-url-path: /actuator/info
 
 # Actuator Configuration
 management:
@@ -94,22 +78,24 @@ management:
     web:
       exposure:
         include: health, info, metrics, gateway, routes
+      base-path: /actuator
   endpoint:
     health:
       show-details: always
     gateway:
       enabled: true
 
-# Logging para DEBUG
+# Logging
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web.cors: DEBUG
     org.springframework.http.server.reactive: DEBUG
+    com.netflix.eureka: INFO
     reactor.netty: INFO
     root: INFO
 
-# JWT Key from environment
+# JWT Key
 security:
   jwt:
     key:
