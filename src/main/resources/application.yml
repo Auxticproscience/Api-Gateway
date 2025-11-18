@@ -21,9 +21,10 @@ spring:
           enabled: true
           lower-case-service-id: true
 
-      # Global filters
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          # Global filters
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+            - PreserveHostHeader
 
       routes:
         # Auth Service Routes
@@ -55,7 +56,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "*"
+            allowedOrigins:
+              - "https://intranet-frontend-pf49.vercel.app"
+              - "http://localhost:4200"
             allowedMethods:
               - GET
               - POST
@@ -68,6 +71,7 @@ spring:
             exposedHeaders:
               - Authorization
             maxAge: 3600
+
 
 # Eureka Client Configuration
 eureka:
