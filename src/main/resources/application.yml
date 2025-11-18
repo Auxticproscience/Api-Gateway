@@ -54,23 +54,19 @@ spring:
 
       # Global CORS
       globalcors:
-        cors-configurations:
+        corsConfigurations:
           '[/**]':
             allowedOrigins:
               - "https://intranet-frontend-pf49.vercel.app"
               - "http://localhost:4200"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
+            allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
-            exposedHeaders:
-              - Authorization
-            maxAge: 3600
+
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+          - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-pf49.vercel.app
+          - AddResponseHeader=Access-Control-Allow-Credentials, true
 
 
 # Eureka Client Configuration
