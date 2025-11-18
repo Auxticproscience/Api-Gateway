@@ -2,18 +2,15 @@
 # API Gateway - Production Configuration
 # ============================================================
 
-# Server Configuration
 server:
   port: 8080
 
-# Application Config
 spring:
   application:
     name: api-gateway
   profiles:
     active: prod
 
-  # Gateway Configuration
   cloud:
     gateway:
       discovery:
@@ -23,7 +20,7 @@ spring:
 
       routes:
         # Gateway Health
-        - id: gateway-simple-health
+        - id: gateway-health
           uri: http://localhost:8080
           predicates:
             - Path=/api/health
@@ -56,7 +53,6 @@ spring:
           predicates:
             - Path=/api/users/**
 
-# Eureka Client Configuration
 eureka:
   client:
     service-url:
@@ -70,9 +66,7 @@ eureka:
     lease-expiration-duration-in-seconds: 30
     instance-id: ${spring.application.name}:${server.port}
     health-check-url-path: /actuator/health
-    status-page-url-path: /actuator/info
 
-# Actuator Configuration
 management:
   endpoints:
     web:
@@ -85,17 +79,14 @@ management:
     gateway:
       enabled: true
 
-# Logging
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.web.cors: DEBUG
     org.springframework.http.server.reactive: DEBUG
-    com.netflix.eureka: INFO
-    reactor.netty: INFO
+    com.intranet.gateway.config: DEBUG
     root: INFO
 
-# JWT Key
 security:
   jwt:
     key:
