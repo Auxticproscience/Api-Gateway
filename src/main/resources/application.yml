@@ -28,7 +28,6 @@ spring:
           filters:
             - RewritePath=/api/health, /actuator/health
 
-        # Auth Service Routes
         - id: auth-login
           uri: lb://auth-service
           predicates:
@@ -65,7 +64,6 @@ eureka:
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
     instance-id: ${spring.application.name}:${server.port}
-    health-check-url-path: /actuator/health
 
 management:
   endpoints:
@@ -82,9 +80,10 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.web.cors: DEBUG
+    org.springframework.web.cors: TRACE
     org.springframework.http.server.reactive: DEBUG
     com.intranet.gateway.config: DEBUG
+    reactor.netty.http.server: DEBUG
     root: INFO
 
 security:
