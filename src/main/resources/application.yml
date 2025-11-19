@@ -7,7 +7,7 @@ spring:
 
   webflux:
     cors:
-      enabled: true
+      enabled: false
 
   cloud:
     gateway:
