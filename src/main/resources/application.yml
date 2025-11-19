@@ -18,7 +18,7 @@ spring:
         cors-configurations:
           "[/**]":
             allowedOrigins:
-              - "https://intranet-frontend-seven.vercel.app"
+              - "https://intranet-frontend-jade.vercel.app/"
               - "http://localhost:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
@@ -53,7 +53,6 @@ spring:
           filters:
             - PreserveHostHeader
 
-        # 🔥 fallback para evitar que WebFlux intente servir archivos estáticos
         - id: fallback
           uri: no://op
           predicates:
