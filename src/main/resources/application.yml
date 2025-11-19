@@ -13,28 +13,20 @@ spring:
 
   cloud:
     gateway:
-
-      # ❌ No usar discovery locator, manejamos rutas manualmente
       discovery:
         locator:
           enabled: false
 
       # ======================================================
-      # 🔹 CORS GLOBAL - intercepta todas las rutas y OPTIONS
+      # CORS GLOBAL
       # ======================================================
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins:
+            allowed-origin-patterns:
               - "https://intranet-frontend-seven.vercel.app"
               - "http://localhost:4200"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - PATCH
-              - OPTIONS
+            allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
@@ -48,19 +40,16 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/login
-            - Method=POST
 
         - id: auth-validate
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/validate
-            - Method=POST
 
         - id: auth-health
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/health
-            - Method=GET
 
         - id: user-service
           uri: lb://user-service
