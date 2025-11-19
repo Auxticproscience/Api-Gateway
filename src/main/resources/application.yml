@@ -1,5 +1,5 @@
 # ============================================================
-# API Gateway - Plan B con CORS en cada ruta
+# API Gateway - Production Configuration (CORS FIXED)
 # ============================================================
 
 server:
@@ -15,57 +15,55 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false
+          enabled: true
+          lowerCaseServiceId: true
 
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://intranet-frontend-seven.vercel.app"
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # ======================================================
+      # Routes
+      # ======================================================
       routes:
-        # Gateway Health
-        - id: gateway-health
-          uri: http://localhost:8080
-          predicates:
-            - Path=/api/health
-          filters:
-            - RewritePath=/api/health, /actuator/health
-            - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-seven.vercel.app
-            - AddResponseHeader=Access-Control-Allow-Credentials, true
-            - AddResponseHeader=Access-Control-Allow-Methods, GET, POST, PUT, DELETE, OPTIONS
-            - AddResponseHeader=Access-Control-Allow-Headers, *
 
-        # Auth Login - CON CORS HEADERS
         - id: auth-login
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/login
-          filters:
-            - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-seven.vercel.app
-            - AddResponseHeader=Access-Control-Allow-Credentials, true
-            - AddResponseHeader=Access-Control-Allow-Methods, GET, POST, PUT, DELETE, OPTIONS
-            - AddResponseHeader=Access-Control-Allow-Headers, *
-            - AddResponseHeader=Access-Control-Max-Age, 3600
+            - Method=POST
 
         - id: auth-validate
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/validate
-          filters:
-            - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-seven.vercel.app
-            - AddResponseHeader=Access-Control-Allow-Credentials, true
+            - Method=POST
 
         - id: auth-health
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/health
-          filters:
-            - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-seven.vercel.app
-            - AddResponseHeader=Access-Control-Allow-Credentials, true
+            - Method=GET
 
         - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
-          filters:
-            - AddResponseHeader=Access-Control-Allow-Origin, https://intranet-frontend-seven.vercel.app
-            - AddResponseHeader=Access-Control-Allow-Credentials, true
 
+# Eureka Client
 eureka:
   client:
     service-url:
@@ -76,6 +74,7 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
 
+# Actuator
 management:
   endpoints:
     web:
