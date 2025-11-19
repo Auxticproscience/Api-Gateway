@@ -1,118 +1,45 @@
-# ============================================================
-# API Gateway - Production Configuration (Render + CORS)
-# ============================================================
-
 server:
   port: ${PORT:8080}
 
 spring:
   application:
     name: api-gateway
-  profiles:
-    active: prod
+
+  webflux:
+    cors:
+      enabled: true
 
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: false
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
 
-      # ======================================================
-      # CORS GLOBAL
-      # ======================================================
       globalcors:
         cors-configurations:
-          '[/**]':
-            allowed-origin-patterns:
-              - "https://intranet-frontend-seven.vercel.app"
-              - "http://localhost:4200"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
-
-      # ======================================================
-      # 🔹 Rutas manuales
-      # ======================================================
-      routes:
-
-        - id: auth-login
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/login
-            - Method=POST,OPTIONS
-
-        - id: auth-validate
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/validate
-            - Method=POST,OPTIONS
-        - id: auth-health
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/health# ============================================================
-# API Gateway - Production Configuration (Render + CORS)
-# ============================================================
-
-server:
-  port: ${PORT:8080}
-
-spring:
-  application:
-    name: api-gateway
-  profiles:
-    active: prod
-
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: false
-
-      # ======================================================
-      # CORS GLOBAL
-      # ======================================================
-      globalcors:
-        cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins:
               - "https://intranet-frontend-seven.vercel.app"
-              - "https://*.vercel.app"
               - "http://localhost:4200"
-              - "http://127.0.0.1:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
 
-      # ======================================================
-      # 🔹 PRE-FLIGHT ROUTE (Render si NO existe → bloquea CORS)
-      # ======================================================
       routes:
 
-        - id: cors-preflight
-          uri: no://op
-          predicates:
-            - Method=OPTIONS
-            - Path=/**
-          filters:
-            - SetStatus=200
-
-        # ======================================================
-        # 🔹 Rutas manuales
-        # ======================================================
-
-        - id: auth-login
+        - id: auth-service-login
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/login
-            - Method=POST
+          filters:
+            - PreserveHostHeader
 
-        - id: auth-validate
+        - id: auth-service-validate
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/validate
-            - Method=POST
+          filters:
+            - PreserveHostHeader
 
         - id: auth-health
           uri: lb://auth-service
@@ -123,45 +50,31 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
+          filters:
+            - PreserveHostHeader
 
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/users/**
-
-# ======================================================
-# Eureka Client
-# ======================================================
 eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER_URL}
-    fetch-registry: true
     register-with-eureka: true
+    fetch-registry: true
+
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
 
-# ======================================================
-# Actuator
-# ======================================================
 management:
   endpoints:
     web:
       exposure:
         include: health, info, metrics, gateway, routes
 
-# ======================================================
-# Logging
-# ======================================================
 logging:
   level:
     org.springframework.cloud.gateway: INFO
     root: INFO
 
-# ======================================================
-# JWT
-# ======================================================
 security:
   jwt:
     key:
