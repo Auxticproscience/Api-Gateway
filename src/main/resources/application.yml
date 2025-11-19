@@ -1,5 +1,5 @@
 # ============================================================
-# API Gateway - Production Configuration (CORS FIXED)
+# API Gateway - Production Configuration (Render + CORS)
 # ============================================================
 
 server:
@@ -13,11 +13,15 @@ spring:
 
   cloud:
     gateway:
+
+      # ❌ No usar discovery locator, manejamos rutas manualmente
       discovery:
         locator:
           enabled: false
-          lowerCaseServiceId: true
 
+      # ======================================================
+      # 🔹 CORS GLOBAL - intercepta todas las rutas y OPTIONS
+      # ======================================================
       globalcors:
         cors-configurations:
           '[/**]':
@@ -36,7 +40,7 @@ spring:
             maxAge: 3600
 
       # ======================================================
-      # Routes
+      # 🔹 Rutas manuales
       # ======================================================
       routes:
 
@@ -63,7 +67,9 @@ spring:
           predicates:
             - Path=/api/users/**
 
+# ======================================================
 # Eureka Client
+# ======================================================
 eureka:
   client:
     service-url:
@@ -74,18 +80,26 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
 
+# ======================================================
 # Actuator
+# ======================================================
 management:
   endpoints:
     web:
       exposure:
         include: health, info, metrics, gateway, routes
 
+# ======================================================
+# Logging
+# ======================================================
 logging:
   level:
     org.springframework.cloud.gateway: INFO
     root: INFO
 
+# ======================================================
+# JWT
+# ======================================================
 security:
   jwt:
     key:
