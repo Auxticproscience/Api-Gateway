@@ -18,7 +18,7 @@ spring:
         cors-configurations:
           "[/**]":
             allowedOrigins:
-              - "intranetproscience.vercel.app"
+              - "https://intranetproscience.vercel.app"
               - "http://localhost:4200"
             allowedMethods: "*"
             allowedHeaders: "*"
