@@ -50,8 +50,79 @@ spring:
         - id: auth-health
           uri: lb://auth-service
           predicates:
+            - Path=/api/auth/health# ============================================================
+# API Gateway - Production Configuration (Render + CORS)
+# ============================================================
+
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+  profiles:
+    active: prod
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+
+      # ======================================================
+      # CORS GLOBAL
+      # ======================================================
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "https://intranet-frontend-seven.vercel.app"
+              - "https://*.vercel.app"
+              - "http://localhost:4200"
+              - "http://127.0.0.1:4200"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+      # ======================================================
+      # 🔹 PRE-FLIGHT ROUTE (Render si NO existe → bloquea CORS)
+      # ======================================================
+      routes:
+
+        - id: cors-preflight
+          uri: no://op
+          predicates:
+            - Method=OPTIONS
+            - Path=/**
+          filters:
+            - SetStatus=200
+
+        # ======================================================
+        # 🔹 Rutas manuales
+        # ======================================================
+
+        - id: auth-login
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/login
+            - Method=POST
+
+        - id: auth-validate
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/validate
+            - Method=POST
+
+        - id: auth-health
+          uri: lb://auth-service
+          predicates:
             - Path=/api/auth/health
 
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
 
         - id: user-service
           uri: lb://user-service
