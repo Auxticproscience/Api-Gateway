@@ -28,10 +28,10 @@ spring:
 
       routes:
 
-        - id: auth-service-login
+        - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/auth/login
+            - Path=/api/auth/**
           filters:
             - PreserveHostHeader
 
