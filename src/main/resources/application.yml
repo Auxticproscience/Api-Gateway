@@ -35,13 +35,6 @@ spring:
           filters:
             - PreserveHostHeader
 
-        - id: auth-service-validate
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/validate
-          filters:
-            - PreserveHostHeader
-
         - id: auth-health
           uri: lb://auth-service
           predicates:
@@ -51,6 +44,13 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
+          filters:
+            - PreserveHostHeader
+
+        - id: academy-service
+          uri: lb://academy-service
+          predicates:
+            - Path=/api/academy/**
           filters:
             - PreserveHostHeader
 
