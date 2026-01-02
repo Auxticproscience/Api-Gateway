@@ -53,7 +53,7 @@ spring:
             - Path=/api/academy/**
           filters:
             - PreserveHostHeader
-
+            - RemoveRequestHeader=Authorization
         - id: fallback
           uri: no://op
           predicates:
