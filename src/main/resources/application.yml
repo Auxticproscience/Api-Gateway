@@ -27,7 +27,6 @@ spring:
             maxAge: 3600
 
       routes:
-
         - id: auth-service
           uri: lb://auth-service
           predicates:
@@ -47,13 +46,21 @@ spring:
           filters:
             - PreserveHostHeader
 
+        - id: academy-exam-submit
+          uri: lb://academy-service
+          predicates:
+            - Path=/api/academy/exam/submit
+          filters:
+            - PreserveHostHeader
+            - RemoveRequestHeader=Authorization
+
         - id: academy-service
           uri: lb://academy-service
           predicates:
             - Path=/api/academy/**
           filters:
             - PreserveHostHeader
-            - RemoveRequestHeader=Authorization
+
         - id: fallback
           uri: no://op
           predicates:
