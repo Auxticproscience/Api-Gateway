@@ -53,7 +53,7 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
         errorResponse.put("path", request.getPath().value());
 
         try {
-           byte [] bytes = objectMapper.writeValueAsBytes(errorResponse);
+            byte [] bytes = objectMapper.writeValueAsBytes(errorResponse);
             DataBuffer dataBuffer = response.bufferFactory().wrap(bytes);
             return response.writeWith(Mono.just(dataBuffer));
         } catch (JsonProcessingException e) {

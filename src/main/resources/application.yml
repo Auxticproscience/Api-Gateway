@@ -5,6 +5,10 @@ spring:
   application:
     name: api-gateway
 
+  webflux:
+    cors:
+      enabled: false
+
   cloud:
     gateway:
       default-filters:
@@ -17,12 +21,7 @@ spring:
             allowedOrigins:
               - "https://intranetproscience.vercel.app"
               - "http://localhost:4200"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
+            allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
             maxAge: 3600
@@ -34,6 +33,11 @@ spring:
             - Path=/api/auth/**
           filters:
             - PreserveHostHeader
+
+        - id: auth-health
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/health
 
         - id: user-service
           uri: lb://user-service
@@ -48,6 +52,13 @@ spring:
             - Path=/api/academy/**
           filters:
             - PreserveHostHeader
+
+        - id: fallback
+          uri: no://op
+          predicates:
+            - Path=/**
+          filters:
+            - SetStatus=404
 
 eureka:
   client:
@@ -64,12 +75,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, gateway, routes
+        include: health, info, metrics, gateway, routes
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
-    reactor.netty.http.client: INFO
+    org.springframework.cloud.gateway: INFO
+    root: INFO
 
 security:
   jwt:
