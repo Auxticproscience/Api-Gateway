@@ -17,11 +17,6 @@ public class GatewayController {
     @Autowired
     private RouteLocator routeLocator;
 
-    @GetMapping("/health")
-    public Mono<ResponseEntity<String>> health() {
-        return Mono.just(ResponseEntity.ok("API Gateway is running!"));
-    }
-
     @GetMapping("/info")
     public Mono<ResponseEntity<Map<String, Object>>> info() {
         Map<String, Object> info = new HashMap<>();

@@ -46,8 +46,6 @@ spring:
           filters:
             - PreserveHostHeader
 
-      
-
         - id: academy-service
           uri: lb://academy-service
           predicates:
