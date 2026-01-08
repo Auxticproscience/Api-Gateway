@@ -42,7 +42,6 @@ Gestiona el enrutamiento, balanceo de carga, seguridad y documentación centrali
 | `JWT_PRIVATE_KEY` | Clave privada para la firma de tokens JWT |
 | `EUREKA_SERVER_URL` | URL del Eureka Server (ej: `http://localhost:8761/eureka`) |
 
-> No incluir secretos directamente en el repositorio.
 
 ### 2. Profiles de Spring
 
