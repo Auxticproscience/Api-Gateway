@@ -11,74 +11,75 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webflux:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
 
-          default-filters:
-            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - ${FRONTEND_URL:https://intranet-proscience.vercel.app}
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
 
-          globalcors:
-            add-to-simple-url-handler-mapping: true
-            cors-configurations:
-              "[/**]":
-                allowedOrigins:
-                  - "https://intranet-proscience.vercel.app"
-                  - "http://localhost:4200"
-                allowedMethods: "*"
-                allowedHeaders: "*"
-                allowCredentials: true
-                maxAge: 3600
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - PreserveHostHeader
 
-          routes:
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/auth/**
-              filters:
-                - PreserveHostHeader
+        - id: auth-health
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/health
 
-            - id: auth-health
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/auth/health
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - PreserveHostHeader
 
-            - id: user-service
-              uri: lb://user-service
-              predicates:
-                - Path=/api/users/**
-              filters:
-                - PreserveHostHeader
+        - id: academy-service
+          uri: lb://academy-service
+          predicates:
+            - Path=/api/academy/**
+          filters:
+            - PreserveHostHeader
 
-            - id: academy-service
-              uri: lb://academy-service
-              predicates:
-                - Path=/api/academy/**
-              filters:
-                - PreserveHostHeader
-
-            - id: fallback
-              uri: no://op
-              predicates:
-                - Path=/**
-              filters:
-                - SetStatus=404
+        - id: fallback
+          uri: no://op
+          predicates:
+            - Path=/**
+          filters:
+            - SetStatus=404
 
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_SERVER_URL}
     register-with-eureka: true
     fetch-registry: true
 
   instance:
-    hostname: localhost
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    instance-id: ${spring.application.name}:${random.value}
 
 security:
   jwt:
     key:
-      private: ${JWT_PRIVATE_KEY:key123}
+      private: ${JWT_PRIVATE_KEY}
 
 management:
   endpoints:
