@@ -1,74 +1,134 @@
-# API Gateway 🛡️
+# 🛡️ API Gateway – Intranet Microservices
 
-El **API Gateway** es el punto de entrada principal para todos los microservicios de la intranet.  
-Gestiona el enrutamiento, balanceo de carga, seguridad y documentación centralizada de los microservicios registrados en **Eureka**.  
-
----
-
-## 📌 Características principales
-
-- **Enrutamiento dinámico:**  
-  Redirige solicitudes a los microservicios registrados en Eureka usando `lb://service-name`.
-  
-- **Filtros y reescritura de rutas:**  
-  - Ejemplo: `/api/auth/login` → Auth Service  
-  - Se agregan cabeceras personalizadas como `X-Gateway-Source` para seguimiento.
-
-- **CORS global y por servicio:**  
-  Configurado para Angular (`http://localhost:4200`) y producción (`https://intranet.proscience.com`).  
-  Permite credenciales y headers personalizados.
-
-- **Seguridad JWT:**  
-  La clave privada se toma de la variable de entorno `JWT_PRIVATE_KEY`.  
-  Facilita la integración de autenticación entre servicios sin exponer la clave en el código.
-
-- **Actuator & Health:**  
-  - Endpoints disponibles: `/actuator/health`, `/actuator/info`, `/actuator/gateway`, `/actuator/routes`  
-  - Permite monitoreo centralizado del gateway y sus rutas.
-
-- **Documentación agregada con Swagger/OpenAPI:**  
-  - `/swagger-ui.html` consolida la documentación de los microservicios:  
-    - Auth Service  
-    - User Service (próximamente)  
+![Maven](https://img.shields.io/badge/Maven-3.9.6-blue)
+![Java](https://img.shields.io/badge/Java-21-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-ready-blue)
+![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-Gateway-green)
+![Status](https://img.shields.io/badge/Status-Development-orange)
 
 ---
 
-## ⚙️ Configuración
+## 📌 Descripción General
 
-### 1. Variables de entorno
+El **API Gateway** es el punto de entrada único para todos los microservicios de la intranet corporativa.
+
+Su responsabilidad es recibir todas las solicitudes del frontend (Angular) y redirigirlas al microservicio correspondiente, aplicando reglas de seguridad, filtros y validaciones antes de que lleguen al destino final.
+
+En otras palabras, es la **puerta de acceso central** de toda la arquitectura.
+
+---
+
+## 🎯 Rol dentro de la Arquitectura
+
+El API Gateway se encarga de:
+
+- 🔀 Enrutamiento dinámico hacia los microservicios registrados en **Eureka**
+- 🔐 Aplicación de seguridad basada en JWT
+- 🌍 Gestión centralizada de CORS
+- 📊 Exposición de endpoints de monitoreo
+- 📘 Consolidación de documentación Swagger
+
+Sin el Gateway, el frontend tendría que comunicarse directamente con cada microservicio, lo que aumentaría la complejidad y los riesgos de seguridad.
+
+---
+
+## 🔀 Enrutamiento Dinámico
+
+Las rutas se configuran utilizando `lb://service-name`, permitiendo balanceo de carga automático gracias a Eureka.
+
+### Ejemplo de funcionamiento:
+
+- `/api/auth/login` → `auth-service`
+- `/api/users/**` → `user-service`
+- `/api/academy/**` → `academy-service`
+- /api/requirement/** → `requirement-service`
+
+El Gateway puede:
+
+- Reescribir rutas
+- Agregar headers personalizados
+- Aplicar filtros antes de reenviar la petición
+
+
+---
+
+## 🔐 Seguridad JWT
+
+El Gateway valida los tokens JWT antes de permitir el acceso a rutas protegidas.
+
+### Variable de entorno requerida:
 
 | Variable | Descripción |
 |----------|-------------|
-| `JWT_PRIVATE_KEY` | Clave privada para la firma de tokens JWT |
-| `EUREKA_SERVER_URL` | URL del Eureka Server (ej: `http://localhost:8761/eureka`) |
+| `JWT_PRIVATE_KEY` | Clave privada utilizada para la validación de tokens JWT |
+| `EUREKA_SERVER_URL` | URL del servidor Eureka (ej: `http://localhost:8761/eureka`) |
 
-
-### 2. Profiles de Spring
-
-- **Dev:** CORS habilitado para localhost, logging DEBUG.
-- **Prod:** CORS limitado al frontend oficial, logging WARN.
-
-### 3. Puertos
-
-- Predeterminado: `8080`  
-  Cambiable en `application.yml` o variable de entorno.
+⚠️ La clave nunca debe estar hardcodeada en el código fuente.
 
 ---
 
-## 🐳 Docker
+## 🌍 Configuración CORS
 
-### Dockerfile
+Se gestiona CORS de forma centralizada.
 
-```dockerfile
-FROM eclipse-temurin:21-jdk-jammy AS build
-WORKDIR /app
-COPY . .
-RUN chmod +x mvnw
-RUN ./mvnw clean package -DskipTests
+### Entornos configurados:
 
-FROM eclipse-temurin:21-jdk-jammy
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+- **Desarrollo:**  
+  `http://localhost:4200`
 
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+- **Producción:**  
+  `https://intranet.proscience.com`
+
+Se permiten:
+
+- Credenciales
+- Headers personalizados
+- Métodos HTTP necesarios (GET, POST, PUT, DELETE, etc.)
+
+---
+
+## 📊 Actuator & Monitoreo
+
+El Gateway expone endpoints para supervisión y diagnóstico:
+
+| Endpoint | Descripción |
+|----------|-------------|
+| `/actuator/health` | Estado general del servicio |
+| `/actuator/info` | Información del build |
+| `/actuator/gateway` | Información del gateway |
+| `/actuator/routes` | Rutas configuradas |
+
+Permite monitoreo centralizado del tráfico y configuración.
+
+---
+
+## 📘 Documentación Unificada (Swagger / OpenAPI)
+
+El Gateway consolida la documentación de los microservicios registrados.
+
+Acceso:
+
+http://localhost:8080/swagger-ui.html
+
+
+Servicios documentados:
+
+- Auth Service
+- User Service (próximamente)
+- Academy Service (próximamente)
+- Requirement Service (próximamente)
+
+Esto permite tener una **documentación centralizada** sin necesidad de acceder a cada servicio individualmente.
+
+---
+
+## 🚀 Ejecución Local
+
+```bash
+mvn spring-boot:run
+
+
+
+
+
+
