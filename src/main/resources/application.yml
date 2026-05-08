@@ -32,19 +32,14 @@ spring:
             maxAge: 3600
 
       routes:
-        - id: auth-service
-          uri: lb://auth-service
+        - id: user-auth
+          uri: lb://user-service
           predicates:
             - Path=/api/auth/**
           filters:
             - PreserveHostHeader
 
-        - id: auth-health
-          uri: lb://auth-service
-          predicates:
-            - Path=/api/auth/health
-
-        - id: user-service
+        - id: user-users
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
@@ -86,7 +81,7 @@ eureka:
 security:
   jwt:
     key:
-      private: ${JWT_PRIVATE_KEY:key123}
+      private: ${JWT_PRIVATE_KEY}
 
 management:
   endpoints:
