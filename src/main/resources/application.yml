@@ -81,7 +81,7 @@ eureka:
 security:
   jwt:
     key:
-      private: ${JWT_PRIVATE_KEY}
+      private: ${JWT_PRIVATE_KEY:key123}
 
 management:
   endpoints:
